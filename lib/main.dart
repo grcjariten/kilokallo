@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 void main() {
+
   runApp(
       const MyApp());
 }
@@ -18,12 +19,37 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MainPage extends StatelessWidget {
+
+
+class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
 
   @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+
+  String? selectedActivity = "Sedentary";
+  String? selectedGoal = "Maintain";
+  final formKey = GlobalKey<FormState>();
+
+
+  List<DropdownMenuItem<String>> activities =  const [
+    DropdownMenuItem(value: "Sedentary", child: Text("Sedentary")),
+    DropdownMenuItem(value: "Light", child: Text("Light Activity")),
+    DropdownMenuItem(value: "Moderate", child: Text("Moderate Activity")),
+    DropdownMenuItem(value: "High", child: Text("High Activity")),
+    DropdownMenuItem(value: "Elite", child: Text("Elite"))];
+
+  List<DropdownMenuItem<String>> goals =  const [
+    DropdownMenuItem(value: "Maintain", child: Text("Maintain")),
+    DropdownMenuItem(value: "Lose", child: Text("Lose")),
+    DropdownMenuItem(value: "Gain", child: Text("Gain"))];
+
+  @override
   Widget build(BuildContext context) {
-    final formKey = GlobalKey<FormState>();
+
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -50,7 +76,7 @@ class MainPage extends StatelessWidget {
                 width: 400,
                 child:
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(18,12,0,5),
+                      padding: const EdgeInsets.fromLTRB(18,8,0,5),
                       child:
                           Form(
                             key: formKey,
@@ -59,13 +85,13 @@ class MainPage extends StatelessWidget {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    fieldText("Gender",17),
-                                    fieldText("Age" , 13),
+                                    fieldText("Gender",16),
+                                    fieldText("Age" , 12),
                                     fieldText("Weight" , 29),
-                                    fieldText("Height" , 14),
-                                    fieldText("Activity" , 25),
-                                    fieldText("BodyFat\n(Opt.)" , 12),
-                                    fieldText("Goal" , 33),
+                                    fieldText("Height" , 17),
+                                    fieldText("Activity" , 27),
+                                    fieldText("BodyFat\n(Opt.)" , 8),
+                                    fieldText("Goal" , 25),
                                   ],
                                 ),
                                 Padding(
@@ -82,9 +108,9 @@ class MainPage extends StatelessWidget {
                                       fieldBox(60, "", null, false),
                                       fieldBox(60, "Kg", null, false),
                                       fieldBox(60, "cm", null, false),
-                                      activityBox(),
+                                      dropdownBox(activities, selectedActivity),
                                       fieldBox(60, "15%", null, true),
-                                      goals(),
+                                      dropdownBox(goals, selectedGoal),
                                       calculateButton(formKey)
                                     ],
                                   ),
@@ -194,7 +220,7 @@ class MainPage extends StatelessWidget {
           ),
           onPressed: () {
             if(key.currentState!.validate()) {
-              print("CIAO!");
+              //TODO: Inserire calcolo
             }
 
           }, child: const Text("Calculate")),
@@ -202,65 +228,25 @@ class MainPage extends StatelessWidget {
 
   }
 
-   Padding activityBox() {
+   Padding dropdownBox(List<DropdownMenuItem<String>> items, String? selectedValue) {
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: SizedBox(
-        width: 170,
-        child: DropdownButtonFormField(
-            value: 0,
-            items: const <DropdownMenuItem> [
-          DropdownMenuItem(
-              value: 0,
-              child: Text("Sedentary")),
-          DropdownMenuItem(
-              value: 1,
-              child: Text("Light Activity")),
-          DropdownMenuItem(
-              value: 2,
-              child: Text("Moderate Activity")),
-          DropdownMenuItem(
-              value: 3,
-              child: Text("High Activity")),
-          DropdownMenuItem(
-              value: 4,
-              child: Text("Elite")),
-        ]
-            , onChanged: null
-        ),
-      ),
+      child: DropdownButton<String>(
+          items: items,
+          onChanged: (value) {
+            selectedValue==selectedActivity?
+            setState(() {
+              selectedActivity = value;
+            })
+            : setState(() {
+              selectedGoal = value;
+            });
+
+          },
+          value: selectedValue,
+        )
     );
   }
-  
-  
-  
-  ToggleButtons goals() {
-
-    Padding choice(String text, IconData iconData, double left, double top, double right, double bottom) {
-      return Padding(
-        padding: EdgeInsets.fromLTRB(left, top, right, bottom),
-        child: Column(
-          children: [
-            Text(text),
-            Icon(iconData, color: Colors.blueGrey,)
-          ],
-        ),
-      );
-    }
-
-    return ToggleButtons(
-      borderWidth: 1.5,
-      borderRadius: BorderRadius.circular(70),
-      borderColor: Colors.black,
-      isSelected: const [true, true, true],
-      children: [
-            choice("Maintain", Icons.accessibility, 20,10,10,10), //TODO: Rendili proporzionali alla larghezza schermo
-            choice(" Lose ", Icons.arrow_downward, 18,10,18,10),
-            choice(" Gain  ", Icons.arrow_upward, 10,10,25,10)
-          ],
-
-    );
-
-  }
-
 }
+
