@@ -29,12 +29,11 @@ class _MainPageState extends State<MainPage> {
   String? selectedActivity = "Sedentary";
   String? selectedGoal = "Maintain";
   final formKey = GlobalKey<FormState>();
-  bool imperial = false;
   bool female = false;
   int ageValue = 25;
   int weightValue = 70;
   int heightValue = 170;
-  int bodyfatValue = 20;
+  int? bodyfatValue;
 
   List<DropdownMenuItem<String>> activities = const [
     DropdownMenuItem(value: "Sedentary", child: Text("Sedentary")),
@@ -57,12 +56,9 @@ class _MainPageState extends State<MainPage> {
       backgroundColor: Colors.blueGrey[300],
       appBar: AppBar(
         backgroundColor: Colors.blueGrey[700],
-        toolbarHeight: 80,
         title: const Text("TDEE Calculator"),
         centerTitle: true,
-        actions: [
-          metricImperial(),
-        ],
+
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(17, 12, 17, 0),
@@ -115,11 +111,11 @@ class _MainPageState extends State<MainPage> {
                                   : const Text("Male")
                             ],
                           ),
-                          numberBox(160, "25", ageValue, 5, 100, false),
-                          numberBox(160, "Kg", weightValue, 35, 250, false),
-                          numberBox(160, "cm", heightValue, 100, 220, false),
+                          numberBox(160, "25", "age", 5, 100, false),
+                          numberBox(160, "Kg", "weight", 35, 250, false),
+                          numberBox(160, "cm", "height", 100, 220, false),
                           dropdownBox(activities, selectedActivity),
-                          numberBox(60, "15%", bodyfatValue, 3, 50, true),
+                          numberBox(60, "15%", "bodyfat", 3, 50, true),
                           dropdownBox(goals, selectedGoal),
                           calculateButton(formKey)
                         ],
@@ -140,23 +136,6 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Column metricImperial() {
-    return Column(children: [
-      const Padding(
-        padding: EdgeInsets.fromLTRB(0.0, 13.0, 9, 0),
-        child: Text("Metric/Imperial"),
-      ),
-      Switch(
-        value: imperial,
-        onChanged: (value) {
-          setState(() {
-            imperial==false ? imperial=true : imperial=false;
-          });
-        },
-      )
-    ]);
-  }
-
   Padding fieldText(String text, double padding) {
     return Padding(
       padding: EdgeInsets.fromLTRB(0, padding, 0, padding),
@@ -167,7 +146,7 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Padding numberBox(double width, String labelText, int result, int minInput, int maxInput, bool optional) {
+  Padding numberBox(double width, String labelText, String type, int minInput, int maxInput, bool optional) {
 
     String? numberValidator(String? value) {
       if(value==null) {
@@ -181,7 +160,17 @@ class _MainPageState extends State<MainPage> {
           }
           return "Invalid Input";
         }
-      result = int.parse(value);
+        switch(type) {
+          case "age": ageValue = int.parse(value);
+          break;
+          case "weight": weightValue = int.parse(value);
+          break;
+          case "height": heightValue = int.parse(value);
+          break;
+          case "bodyfat": bodyfatValue = int.parse(value);
+          break;
+        }
+
       return null;
     }
 
@@ -234,13 +223,51 @@ class _MainPageState extends State<MainPage> {
   }
 
   Padding calculateButton(GlobalKey<FormState> key) {
+
+    double genderIndex = female == true ? 655 : 66;
+    double weightIndex = female == true ? 9.6 : 13.7;
+    double heightIndex = female == true ? 1.8 : 5;
+    double ageIndex = female == true ? 4.7 : 6.8;
+
+    double activityIndex() {
+
+      switch(selectedActivity) {
+      case "Sedentary" : return 1.2;
+      case "Light" : return 1.375;
+      case "Moderate" : return 1.55;
+      case "High" : return 1.725;
+      case "Elite" : return 1.9;
+    }
+      return 1.2;
+    }
+
+    double goalTdee(double tdee) {
+      if(selectedGoal=="Lose") {
+        return tdee - (tdee * 0.2);
+      } else if(selectedGoal=="Gain") {
+        return tdee + 200;
+      } else {
+        return tdee;
+      }
+    }
+
+
     return Padding(
       padding: const EdgeInsets.only(top: 15),
       child: ElevatedButton(
           style: ElevatedButton.styleFrom(primary: Colors.blueGrey[700]),
           onPressed: () {
+            double bmr;
             if (key.currentState!.validate()) {
-              //TODO: Inserire calcolo
+
+              bodyfatValue != null ? bmr = genderIndex + (weightIndex * weightValue) + (heightIndex * heightValue) - (ageIndex * ageValue)
+              : bmr= 370 + (21.6 * 62.4);
+              double tdee = bmr * activityIndex();
+              double finalTdee = goalTdee(tdee);
+              print("BMR is $bmr");
+              print("TDEE is $tdee");
+              print("goal TDEE is $finalTdee");
+              bodyfatValue = null;
             }
           },
           child: const Text("Calculate")),
