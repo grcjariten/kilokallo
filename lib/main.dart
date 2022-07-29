@@ -30,10 +30,16 @@ class _MainPageState extends State<MainPage> {
   String? selectedGoal = "Maintain";
   final formKey = GlobalKey<FormState>();
   bool female = false;
+  bool imperial = false;
   int ageValue = 25;
   int weightValue = 70;
   int heightValue = 170;
-  int? bodyfatValue;
+  int bodyfatValue = 0;
+
+  TextEditingController ageController = TextEditingController();
+  TextEditingController weightController = TextEditingController();
+  TextEditingController heightController = TextEditingController();
+  TextEditingController bodyfatController = TextEditingController();
 
   List<DropdownMenuItem<String>> activities = const [
     DropdownMenuItem(value: "Sedentary", child: Text("Sedentary")),
@@ -55,9 +61,29 @@ class _MainPageState extends State<MainPage> {
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.blueGrey[300],
       appBar: AppBar(
+        toolbarHeight: 80,
         backgroundColor: Colors.blueGrey[700],
         title: const Text("TDEE Calculator"),
         centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 15, 10, 0),
+            child: Column(
+              children: [
+                const Text("Metric/Imperial"),
+                Switch(value: imperial, onChanged: (value) {
+                  setState(() {
+                    value == false ? imperial = false : imperial = true;
+                    print(imperial);
+                  });
+
+                })
+              ],
+
+            ),
+          ),
+
+        ],
 
       ),
       body: Padding(
@@ -100,9 +126,8 @@ class _MainPageState extends State<MainPage> {
                                 value: female,
                                 onChanged: (value) {
                                   setState(() {
-                                    female == true
-                                        ? female = false
-                                        : female = true;
+                                    value == false ? female = false : female = true;
+
                                   });
                                 },
                               ),
@@ -111,11 +136,11 @@ class _MainPageState extends State<MainPage> {
                                   : const Text("Male")
                             ],
                           ),
-                          numberBox(160, "25", "age", 5, 100, false),
-                          numberBox(160, "Kg", "weight", 35, 250, false),
-                          numberBox(160, "cm", "height", 100, 220, false),
+                          numberBox(160, "25", "age", ageController, 5, 100, false),
+                          numberBox(160, "Kg", "weight", weightController, 35, 250, false),
+                          numberBox(160, "cm", "height", heightController, 100, 220, false),
                           dropdownBox(activities, selectedActivity),
-                          numberBox(60, "15%", "bodyfat", 3, 50, true),
+                          numberBox(60, "15%", "bodyfat", bodyfatController, 3, 50, true),
                           dropdownBox(goals, selectedGoal),
                           calculateButton(formKey)
                         ],
@@ -146,8 +171,7 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Padding numberBox(double width, String labelText, String type, int minInput, int maxInput, bool optional) {
-
+  Padding numberBox(double width, String labelText, String type, TextEditingController controller, int minInput, int maxInput, bool optional) {
     String? numberValidator(String? value) {
       if(value==null) {
         return null;
@@ -161,6 +185,7 @@ class _MainPageState extends State<MainPage> {
           return "Invalid Input";
         }
         switch(type) {
+
           case "age": ageValue = int.parse(value);
           break;
           case "weight": weightValue = int.parse(value);
@@ -170,7 +195,8 @@ class _MainPageState extends State<MainPage> {
           case "bodyfat": bodyfatValue = int.parse(value);
           break;
         }
-
+      controller.clear();
+      female = false;
       return null;
     }
 
@@ -180,6 +206,7 @@ class _MainPageState extends State<MainPage> {
         width: width,
         height: 43,
         child: TextFormField(
+          controller: controller,
           keyboardType: TextInputType.number,
           inputFormatters: <TextInputFormatter>[
             FilteringTextInputFormatter.digitsOnly
@@ -195,32 +222,6 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-
-
-  Padding fieldBox(double width, String labelText, function, bool optional) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: SizedBox(
-        width: width,
-        height: 43,
-        child: TextFormField(
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              if (optional == false) {
-                return '* Required field';
-              }
-            }
-            return null;
-          },
-          obscureText: false,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            labelText: labelText,
-          ),
-        ),
-      ),
-    );
-  }
 
   Padding calculateButton(GlobalKey<FormState> key) {
 
@@ -259,15 +260,14 @@ class _MainPageState extends State<MainPage> {
           onPressed: () {
             double bmr;
             if (key.currentState!.validate()) {
-
-              bodyfatValue != null ? bmr = genderIndex + (weightIndex * weightValue) + (heightIndex * heightValue) - (ageIndex * ageValue)
-              : bmr= 370 + (21.6 * 62.4);
+              bodyfatValue == 0 ? bmr = genderIndex + (weightIndex * weightValue) + (heightIndex * heightValue) - (ageIndex * ageValue)
+              : bmr= 370 + (21.6 * weightValue * (100 - bodyfatValue)/100);
               double tdee = bmr * activityIndex();
               double finalTdee = goalTdee(tdee);
               print("BMR is $bmr");
               print("TDEE is $tdee");
               print("goal TDEE is $finalTdee");
-              bodyfatValue = null;
+              bodyfatValue = 0;
             }
           },
           child: const Text("Calculate")),
