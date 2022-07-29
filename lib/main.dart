@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:tdeecalculator/output.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,6 +37,11 @@ class _MainPageState extends State<MainPage> {
   double weightValue = 70;
   double heightValue = 170;
   double bodyfatValue = 0;
+
+  double bmr = 0;
+  double tdee = 0;
+  double finalTdee = 0;
+  double bmi = 0;
 
   TextEditingController ageController = TextEditingController();
   TextEditingController weightController = TextEditingController();
@@ -309,7 +315,6 @@ class _MainPageState extends State<MainPage> {
             imperial == true
                 ? heightValue = imperialConversion(selectedHeight)
                 : null;
-            double bmr;
             if (key.currentState!.validate()) {
               bodyfatValue == 0
                   ? bmr = genderIndex +
@@ -318,9 +323,9 @@ class _MainPageState extends State<MainPage> {
                       (ageIndex * ageValue)
                   : bmr =
                       370 + (21.6 * weightValue * (100 - bodyfatValue) / 100);
-              double tdee = bmr * activityIndex();
-              double finalTdee = goalTdee(tdee);
-              double bmi = weightValue / ((heightValue/100)*(heightValue/100));
+              tdee = bmr * activityIndex();
+              finalTdee = goalTdee(tdee);
+              bmi = weightValue / ((heightValue/100)*(heightValue/100));
               print("BMR is $bmr");
               print("TDEE is $tdee");
               print("goal TDEE is $finalTdee");
@@ -328,6 +333,11 @@ class _MainPageState extends State<MainPage> {
               bodyfatValue = 0;
 
             }
+            Navigator.push(context,
+              MaterialPageRoute(builder: (context) =>
+              OutputPage(finalTdee: finalTdee, tdee: tdee, bmi: bmi, bmr: bmr,)
+              )
+            );
           },
           child: const Text("Submit"));
 
