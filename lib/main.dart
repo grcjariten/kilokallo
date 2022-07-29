@@ -170,9 +170,9 @@ class _MainPageState extends State<MainPage> {
                             ],
                           ),
                           numberBox(
-                              160, "25", "age", ageController, 5, 100, false),
-                          numberBox(160, imperial == false ? "Kg" : "lbs", "weight", weightController, 35,
-                              250, false),
+                              160, "years", "age", ageController, 5, 100, false),
+                          numberBox(160, imperial == false ? "Kg" : "lbs", "weight", weightController, imperial == false ? 35: 77,
+                              imperial == false ? 300: 661, false),
                           imperial == false
                               ? numberBox(160, "cm", "height", heightController,
                                   100, 220, false)
@@ -320,10 +320,13 @@ class _MainPageState extends State<MainPage> {
                       370 + (21.6 * weightValue * (100 - bodyfatValue) / 100);
               double tdee = bmr * activityIndex();
               double finalTdee = goalTdee(tdee);
+              double bmi = weightValue / ((heightValue/100)*(heightValue/100));
               print("BMR is $bmr");
               print("TDEE is $tdee");
               print("goal TDEE is $finalTdee");
+              print("your BMI is $bmi");
               bodyfatValue = 0;
+
             }
           },
           child: const Text("Submit"));
