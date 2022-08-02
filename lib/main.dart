@@ -122,7 +122,6 @@ class _MainPageState extends State<MainPage> {
                     onChanged: (value) {
                       setState(() {
                         imperial = value;
-                        print(imperial);
                       });
                     })
               ],
@@ -174,7 +173,6 @@ class _MainPageState extends State<MainPage> {
                                 onChanged: (value) {
                                   setState(() {
                                     female = value;
-                                    print(female);
                                   });
                                 },
                               ),
@@ -336,12 +334,6 @@ class _MainPageState extends State<MainPage> {
               finalTdee = goalTdee(tdee);
               bmi = weightValue / ((heightValue/100)*(heightValue/100));
 
-
-              print("BMR is $bmr");
-              print("TDEE is $tdee");
-              print("goal TDEE is $finalTdee");
-              print("your BMI is $bmi");
-              print("your Ideal Weight is $idealWeight");
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) =>
                       OutputPage(finalTdee: finalTdee, tdee: tdee, bmi: bmi, bmr: bmr, idealWeight: idealWeight)
