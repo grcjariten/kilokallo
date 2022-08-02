@@ -27,6 +27,8 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+
+
   String? selectedActivity = "Sedentary";
   String? selectedGoal = "Maintain";
   String? selectedHeight = "5ft 1in";
@@ -37,6 +39,7 @@ class _MainPageState extends State<MainPage> {
   double weightValue = 70;
   double heightValue = 170;
   double bodyfatValue = 0;
+  double idealWeight = 0;
 
   double bmr = 0;
   double tdee = 0;
@@ -97,6 +100,8 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.blueGrey[300],
@@ -112,10 +117,11 @@ class _MainPageState extends State<MainPage> {
               children: [
                 const Text("Metric/Imperial"),
                 Switch(
+                    activeColor: Colors.white,
                     value: imperial,
                     onChanged: (value) {
                       setState(() {
-                        value == false ? imperial = false : imperial = true;
+                        imperial = value;
                         print(imperial);
                       });
                     })
@@ -133,8 +139,8 @@ class _MainPageState extends State<MainPage> {
                 borderRadius: const BorderRadius.all(Radius.circular(6))),
 
             height:
-                470, //TODO: Mettere altezza e larghezza in relazione allo schermo
-            width: 400,
+                470,
+            width: size.width,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(18, 8, 0, 5),
               child: Form(
@@ -161,12 +167,14 @@ class _MainPageState extends State<MainPage> {
                           Row(
                             children: [
                               Switch(
+                                activeColor: Colors.blueGrey[700],
+                                inactiveThumbColor: Colors.blueGrey,
+                                inactiveTrackColor: Colors.blueGrey[200],
                                 value: female,
                                 onChanged: (value) {
                                   setState(() {
-                                    value == false
-                                        ? female = false
-                                        : female = true;
+                                    female = value;
+                                    print(female);
                                   });
                                 },
                               ),
@@ -201,7 +209,7 @@ class _MainPageState extends State<MainPage> {
       bottomNavigationBar: Container(
         height: 70,
         color: Colors.blueGrey,
-        child: const Center(child: Text("Banner Admob")),
+        child: const Center(child: Text("")),
       ),
     );
   }
@@ -278,10 +286,11 @@ class _MainPageState extends State<MainPage> {
   }
 
   ElevatedButton submitButton(GlobalKey<FormState> key) {
-    double genderIndex = female == true ? 655 : 66;
-    double weightIndex = female == true ? 9.6 : 13.7;
-    double heightIndex = female == true ? 1.8 : 5;
-    double ageIndex = female == true ? 4.7 : 6.8;
+    double genderIndex = female == true ? 655.0955 : 66.4730;
+    double weightIndex = female == true ? 9.5634 : 13.7516;
+    double heightIndex = female == true ? 1.8496 : 5.0033;
+    double ageIndex = female == true ? 4.6756 : 6.7550;
+    double idealWeight = female == true ? heightValue - 100 - (heightValue - 150) / 2 : heightValue - 100 - (heightValue - 150) / 4;
 
     double activityIndex() {
       switch (selectedActivity) {
@@ -326,18 +335,21 @@ class _MainPageState extends State<MainPage> {
               tdee = bmr * activityIndex();
               finalTdee = goalTdee(tdee);
               bmi = weightValue / ((heightValue/100)*(heightValue/100));
+
+
               print("BMR is $bmr");
               print("TDEE is $tdee");
               print("goal TDEE is $finalTdee");
               print("your BMI is $bmi");
-              bodyfatValue = 0;
+              print("your Ideal Weight is $idealWeight");
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) =>
+                      OutputPage(finalTdee: finalTdee, tdee: tdee, bmi: bmi, bmr: bmr, idealWeight: idealWeight)
+                  )
+              );
 
             }
-            Navigator.push(context,
-              MaterialPageRoute(builder: (context) =>
-              OutputPage(finalTdee: finalTdee, tdee: tdee, bmi: bmi, bmr: bmr,)
-              )
-            );
+
           },
           child: const Text("Submit"));
 
