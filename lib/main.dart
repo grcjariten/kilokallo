@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tdeecalculator/functions.dart';
-import 'package:tdeecalculator/output.dart';
+import 'package:tdeecalculator/layout/elements.dart';
+import 'layout/values.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -29,7 +31,6 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
 
-
   String? selectedActivity = "Sedentary";
   String? selectedGoal = "Maintain";
   String? selectedHeight = "5ft 1in";
@@ -49,56 +50,37 @@ class _MainPageState extends State<MainPage> {
   double? bmi;
 
 
-  List<DropdownMenuItem<String>> activities = const [
-    DropdownMenuItem(value: "Sedentary", child: Text("Sedentary")),
-    DropdownMenuItem(value: "Light", child: Text("Light Activity")),
-    DropdownMenuItem(value: "Moderate", child: Text("Moderate Activity")),
-    DropdownMenuItem(value: "High", child: Text("High Activity")),
-    DropdownMenuItem(value: "Elite", child: Text("Elite"))
-  ];
-
-  List<DropdownMenuItem<String>> goals = const [
-    DropdownMenuItem(value: "Maintain", child: Text("Maintain")),
-    DropdownMenuItem(value: "Lose", child: Text("Lose")),
-    DropdownMenuItem(value: "Gain", child: Text("Gain"))
-  ];
-
-  List<DropdownMenuItem<String>> imperialHeights = const [
-    DropdownMenuItem(value: "4ft 7in", child: Text("4ft 7in")),
-    DropdownMenuItem(value: "4ft 8in", child: Text("4ft 8in")),
-    DropdownMenuItem(value: "4ft 9in", child: Text("4ft 9in")),
-    DropdownMenuItem(value: "4ft 10in", child: Text("4ft 10in")),
-    DropdownMenuItem(value: "4ft 11in", child: Text("4ft 11in")),
-    DropdownMenuItem(value: "5ft 0in", child: Text("5ft 0in")),
-    DropdownMenuItem(value: "5ft 1in", child: Text("5ft 1in")),
-    DropdownMenuItem(value: "5ft 2in", child: Text("5ft 2in")),
-    DropdownMenuItem(value: "5ft 3in", child: Text("5ft 3in")),
-    DropdownMenuItem(value: "5ft 4in", child: Text("5ft 4in")),
-    DropdownMenuItem(value: "5ft 5in", child: Text("5ft 5in")),
-    DropdownMenuItem(value: "5ft 6in", child: Text("5ft 6in")),
-    DropdownMenuItem(value: "5ft 7in", child: Text("5ft 7in")),
-    DropdownMenuItem(value: "5ft 8in", child: Text("5ft 8in")),
-    DropdownMenuItem(value: "5ft 9in", child: Text("5ft 9in")),
-    DropdownMenuItem(value: "5ft 10in", child: Text("5ft 10in")),
-    DropdownMenuItem(value: "5ft 11in", child: Text("5ft 11in")),
-    DropdownMenuItem(value: "6ft 0in", child: Text("6ft 0in")),
-    DropdownMenuItem(value: "6ft 1in", child: Text("6ft 1in")),
-    DropdownMenuItem(value: "6ft 2in", child: Text("6ft 2in")),
-    DropdownMenuItem(value: "6ft 3in", child: Text("6ft 3in")),
-    DropdownMenuItem(value: "6ft 4in", child: Text("6ft 4in")),
-    DropdownMenuItem(value: "6ft 5in", child: Text("6ft 5in")),
-    DropdownMenuItem(value: "6ft 6in", child: Text("6ft 6in")),
-    DropdownMenuItem(value: "6ft 7in", child: Text("6ft 7in")),
-    DropdownMenuItem(value: "6ft 8in", child: Text("6ft 8in")),
-    DropdownMenuItem(value: "6ft 9in", child: Text("6ft 9in")),
-    DropdownMenuItem(value: "6ft 10in", child: Text("6ft 10in")),
-    DropdownMenuItem(value: "6ft 11in", child: Text("6ft 11in")),
-    DropdownMenuItem(value: "7ft 0in", child: Text("7ft 0in")),
-  ];
-
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+
+    imperialCallBack(bool value) {
+      setState(() {
+        imperial = value;
+      });
+    }
+    
+    genderCallBack(bool value) {
+      setState(() {
+        female = value;
+      });
+    }
+
+    dropCallBack(String parameter, String value) {
+      if(parameter == selectedHeight) {
+        setState(() {
+          selectedHeight = value;
+        });
+      } else if(parameter == selectedActivity) {
+        setState(() {
+          selectedActivity = value;
+        });
+      } else if(parameter == selectedHeight) {
+        setState(() {
+          selectedHeight = value;
+        });
+      }
+    }
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -114,14 +96,7 @@ class _MainPageState extends State<MainPage> {
             child: Column(
               children: [
                 const Text("Metric/Imperial"),
-                Switch(
-                    activeColor: Colors.white,
-                    value: imperial,
-                    onChanged: (value) {
-                      setState(() {
-                        imperial = value;
-                      });
-                    })
+                FormSwitch(parameter: imperial, callBackFunction: imperialCallBack, color1: Colors.orange[900], color2: Colors.blueGrey, color3: Colors.blueGrey[200],)
               ],
             ),
           ),
@@ -134,7 +109,6 @@ class _MainPageState extends State<MainPage> {
             decoration: BoxDecoration(
                 color: Colors.grey[200],
                 borderRadius: const BorderRadius.all(Radius.circular(6))),
-
             height:
                 470,
             width: size.width,
@@ -163,17 +137,7 @@ class _MainPageState extends State<MainPage> {
                         children: [
                           Row(
                             children: [
-                              Switch(
-                                activeColor: Colors.blueGrey[700],
-                                inactiveThumbColor: Colors.blueGrey,
-                                inactiveTrackColor: Colors.blueGrey[200],
-                                value: female,
-                                onChanged: (value) {
-                                  setState(() {
-                                    female = value;
-                                  });
-                                },
-                              ),
+                              FormSwitch(parameter: female, callBackFunction: genderCallBack, color1: Colors.orange, color2: Colors.blueGrey, color3: Colors.blueGrey[200]),
                               female == true
                                   ? const Text("Female")
                                   : const Text("Male")
@@ -186,11 +150,11 @@ class _MainPageState extends State<MainPage> {
                           imperial == false
                               ? numberBox(160, "cm", "height",
                                   100, 220, false)
-                              : dropdownBox(imperialHeights, selectedHeight),
-                          dropdownBox(activities, selectedActivity),
+                              : ChoiceBox(list: imperialHeights, selectedValue: selectedHeight,callBackFunction: dropCallBack),
+                          ChoiceBox(list: activities, selectedValue: selectedActivity, callBackFunction: dropCallBack),
                           numberBox(60, "15%", "bodyfat", 3,
                               50, true),
-                          dropdownBox(goals, selectedGoal),
+                          ChoiceBox(list: goals, selectedValue: selectedGoal, callBackFunction: dropCallBack),
                           submitButton(formKey)
                         ],
                       ),
@@ -281,22 +245,22 @@ class _MainPageState extends State<MainPage> {
   }
 
   ElevatedButton submitButton(GlobalKey<FormState> key) {
-    double genderIndex = female == true ? 655.0955 : 66.4730;
-    double weightIndex = female == true ? 9.5634 : 13.7516;
-    double heightIndex = female == true ? 1.8496 : 5.0033;
-    double ageIndex = female == true ? 4.6756 : 6.7550;
 
-    ageValue==null ? ageValue = 25 : null;
-    weightValue == null ? weightValue = 70 : null;
-    heightValue == null ? heightValue = 170 : null;
-    bodyfatValue == null ? bodyfatValue = 0 : null;
+    double genderIndex = genderIndexParameter(female);
+    double weightIndex = weightIndexParameter(female);
+    double heightIndex = heightIndexParameter(female);
+    double ageIndex = ageIndexParameter(female);
 
-    bmr == null ? bmr= 0 : null;
-    tdee == null ? tdee = 0 : null;
-    finalTdee == null ? finalTdee= 0 : null;
-    bmi == null ? bmi = 0 : null;
+    ageValue = standardValue(ageValue, 25);
+    weightValue = standardValue(weightValue, 70);
+    bodyfatValue = standardValue(bodyfatValue, 0);
+    bmr = standardValue(bmr, 0);
+    tdee = standardValue(tdee, 0);
+    finalTdee = standardValue(finalTdee, 0);
+    bmi = standardValue(bmi, 0);
 
-    double idealWeight = female == true ? heightValue! - 100 - (heightValue! - 150) / 2 : heightValue! - 100 - (heightValue! - 150) / 4;
+
+    double idealWeight = idealWeightParameter(female, heightValue);
 
     return ElevatedButton(
           style: ElevatedButton.styleFrom(primary: Colors.blueGrey[700]),
@@ -307,35 +271,10 @@ class _MainPageState extends State<MainPage> {
             if (key.currentState!.validate()) {
               formValidate(context, bodyfatValue! ,weightValue!,weightIndex,idealWeight,heightValue!,heightIndex,ageValue!,ageIndex, genderIndex, selectedActivity, selectedGoal, tdee!,finalTdee!,bmr!, bmi!);
             }
-
+            bodyfatValue = 0;
           },
           child: const Text("Submit"));
 
-  }
-
-  Padding dropdownBox(
-      List<DropdownMenuItem<String>> items, String? selectedValue) {
-    return Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: DropdownButton<String>(
-          items: items,
-          onChanged: (value) {
-            if (selectedValue == selectedActivity) {
-              setState(() {
-                selectedActivity = value;
-              });
-            } else if (selectedValue == selectedActivity) {
-              setState(() {
-                selectedGoal = value;
-              });
-            } else if (selectedValue == selectedHeight) {
-              setState(() {
-                selectedHeight = value;
-              });
-            }
-          },
-          value: selectedValue,
-        ));
   }
 
 

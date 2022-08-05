@@ -116,4 +116,33 @@ double imperialConversion(String? selectedHeight) {
   return 154.94;
 }
 
+double genderIndexParameter(bool gender) {
+  return gender == true ? 655.0955 : 66.4730;
+}
 
+double weightIndexParameter(bool gender) {
+  return gender == true ? 9.5634 : 13.7516;
+}
+
+double heightIndexParameter(bool gender) {
+  return gender == true ? 1.8496 : 5.0033;
+}
+
+double ageIndexParameter(bool gender) {
+  return gender == true ? 4.6756 : 6.7550;
+}
+
+double standardValue(double? value, double standardValue) {
+  if (value == null) {
+    return standardValue;
+  } else {
+    return value;
+  }
+}
+
+double idealWeightParameter(bool gender, double? heightValue) {
+  if(heightValue!=null) {
+    return gender == true ? heightValue - 100 - (heightValue - 150) / 2 : heightValue - 100 - (heightValue - 150) / 4;
+  }
+ return 70;
+}
